@@ -1,5 +1,9 @@
 # Reason-React context explained in action
 
+Originally published on [dev.to](https://dev.to/margaretkrutikova/reason-react-context-explained-in-action-5eki).
+
+---
+
 [`Context`](https://reactjs.org/docs/context.html) in `react` is designed for sharing some global data between your components located at different levels of the component tree. It allows to avoid passing `props` all the way down to those components ("prop-drilling") while still updating them whenever the value in `context` changes.
 
 It is recommended to use `context` for low-frequent updates ([quote by Sebastian Markbåge](https://github.com/facebook/react/issues/14110#issuecomment-448074060)), due to a possible performance impact because of to the way `react` finds subscribers to the context value. This topic would require it is own article (or perhaps a book?), and I will not touch upon it here and instead focus on a practical example of using `context` for seldom updates in a `react` application with `reasonml`.
