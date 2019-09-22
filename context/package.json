@@ -7,6 +7,7 @@
     "clean": "bsb -clean-world",
     "test": "echo \"Error: no test specified\" && exit 1",
     "webpack": "webpack -w",
+    "netlify:build": "npm i && npm run webpack:production",
     "webpack:production": "NODE_ENV=production webpack",
     "server": "webpack-dev-server"
   },
