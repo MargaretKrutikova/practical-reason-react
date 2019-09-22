@@ -2,13 +2,17 @@
 let make = () => {
   let (user, _) = UserContext.useUser();
 
-  <div>
+  <>
     <h1> {React.string("A page")} </h1>
     {switch (user) {
      | Anonymous =>
-       <span> {React.string("Sneaky, you are browsing anonymously!")} </span>
+       <span className="user-message">
+         {React.string("Sneaky, you are browsing anonymously!")}
+       </span>
      | LoggedIn(userName) =>
-       <span> {React.string("Welcome, " ++ userName ++ "!")} </span>
+       <span className="user-message">
+         {React.string("Welcome, " ++ userName ++ "!")}
+       </span>
      }}
-  </div>;
+  </>;
 };

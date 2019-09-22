@@ -10,8 +10,8 @@ body {
 main {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  padding-top: 10vh;
   flex: 1 1 auto;
 }
 header {
@@ -109,4 +109,8 @@ button:hover {
 }
 .logout-link {
   font-size: 18px;
+}
+.user-message {
+  font-size: 22px;
+  letter-spacing: 1px;
 }
