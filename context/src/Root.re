@@ -15,8 +15,7 @@ let make = () => {
 
   // if needed, could be optimized with useMemo, or split into two context
   // providers for user and dispatch separately
-
   <UserProvider value=(state.user, dispatch)>
-    <> <Header /> <main> <h1> {React.string("Dashboard")} </h1> </main> </>
+    <> <Header /> <main> <Page /> </main> </>
   </UserProvider>;
 };
