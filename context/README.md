@@ -12,13 +12,13 @@ There are many bits and pieces that have to be wired up together in order to get
 
 I will go through the steps needed to connect everything together and we will end up with a simple hook that allows to read the user data from context and dispatch and action to update it from any component, like this:
 
-```reasonml
+```reason
 let (user, dispatch) = UserContext.useUser();
 let handleLogIn = () => dispatch(UserLoggedIn(userName));
 
 switch (user) {
-  | Anonymous => /** display login form */
-  | LoggedIn(userName) => /** say hi to the user! */
+  | Anonymous => // display login form
+  | LoggedIn(userName) => // say hi to the user!
 };
 ```
 
@@ -34,8 +34,8 @@ We will start with these steps:
 
 We need to know whether the user using our app is anonymous or logged in, and what actions can change this, so let's start with a few types:
 
-```reasonml
-/** Types.re */
+```reason
+// Types.re
 type user =
   | Anonymous
   | LoggedIn(string);
@@ -49,21 +49,21 @@ type userAction =
 
 Now let's create context and reusable hook to access the context value, in a file `UserContext.re`:
 
-```reasonml
-/** initial value is Anonymous */
+```reason
+// initial value is Anonymous
 let context = React.createContext(Anonymous);
 
-/** hook to easily access context value */
+// hook to easily access context value
 let useUser = () => React.useContext(context);
 ```
 
 This is very similar to how you would do it in JS. Now let's create context provider in a file `UserProvider.re`
 
-```reasonml
-/** UserProvider.re */
+```reason
+// UserProvider.re
 let make = React.Context.provider(UserContext.context);
 
-/** Tell bucklescript how to translate props into JS */
+// Tell bucklescript how to translate props into JS
 let makeProps = (~value, ~children, ()) => {
   "value": value,
   "children": children,
@@ -78,7 +78,7 @@ That's what the attribute [`[@react.component]`](https://reasonml.github.io/reas
 
 `React.Context.provider` already generates a react component, that uses `props` as a JS object, but we want to use it as a `reason` component with named args. That's why we create `makeProps` by hand and it will tell bucklescript how to translate our named args into a JS object, consumed as `props` by the JS component. And in order to create an object that will compile cleanly to a JS object, we use bucklescript [`Object 2`](https://bucklescript.github.io/docs/en/object-2) bindings, that look like this:
 
-```reasonml
+```reason
 {
   "value": value,
   "children": children,
@@ -97,11 +97,11 @@ The important thing to understand here, is that if we want to **update** the val
 
 Let's call it `Root` component:
 
-```reasonml
-/** Root.re */
+```reason
+// Root.re
 type state = {user};
 
-/** user and userAction defined in Types.re */
+// user and userAction defined in Types.re
 let reducer = (_, action) =>
   switch (action) {
   | UserLoggedIn(userName) => {user: LoggedIn(userName)}
@@ -126,19 +126,19 @@ Let's give our components possibility to update user data via context. We could 
 
 Let's pass our `dispatch` along with `user` as context value. Knowing that `dispatch` accepts `userAction` and returns `unit`, we can modify the type of context value in `UserContext.re`:
 
-```reasonml
-/** UserContext.re */
+```reason
+// UserContext.re
 type dispatch = userAction => unit;
 type contextValue = (user, dispatch);
 
 let initValue: contextValue = (Anonymous, _ => ignore());
-/** no changes when creating context */
+// no changes when creating context
 ```
 
 and the root component:
 
-```reasonml
-/** Root.re */
+```reason
+// Root.re
 let make = () => {
   let (state, dispatch) = React.useReducer(reducer, {user: Anonymous});
 
@@ -152,18 +152,14 @@ let make = () => {
 
 And now the reward I promised in the beginning, an easy to use and convenient hook. I will just repeat it here once more, because it is cool:
 
-```reasonml
+```reason
 let (user, dispatch) = UserContext.useUser();
 let handleLogIn = () => dispatch(UserLoggedIn(userName));
 
 switch (user) {
-  | Anonymous => /** display login form */
-  | LoggedIn(userName) => /** say hi to the user! */
+  | Anonymous => // display login form
+  | LoggedIn(userName) => // say hi to the user!
 };
 ```
 
----
-
-We have now set up all we need to use context for storing and updating a small amount of global data in our `reason-react` application. We have also looked into some underlying mechanisms of how `context` works in `react` and how components are compiled in `reason-react`.
-
-Have I missed something or made a mistake? Please let me know in the comments. Or just drop a line about how you are using `context` in your application! 💬
+Done!
