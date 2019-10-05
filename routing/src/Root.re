@@ -6,7 +6,7 @@ let make = () => {
     React.useMemo1(
       () =>
         switch (route) {
-        | Search => <SearchPage />
+        | Search(searchParams) => <SearchPage searchParams />
         | Product(id) => <ProductPage />
         | Home => <HomePage />
         | NotFound => <NotFoundPage />
@@ -18,7 +18,8 @@ let make = () => {
       <RouterLink href={Routing.routeToUrl(Home)} className="nav-link">
         {React.string("Home")}
       </RouterLink>
-      <RouterLink href={Routing.routeToUrl(Search)} className="nav-link">
+      <RouterLink
+        href={Routing.routeToUrl(Search(None))} className="nav-link">
         {React.string("Search")}
       </RouterLink>
     </header>
