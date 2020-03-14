@@ -7,7 +7,7 @@ let make = () => {
       () =>
         switch (route) {
         | Search(searchParams) => <SearchPage searchParams />
-        | Product(id) => <ProductPage />
+        | Product(_) => <ProductPage />
         | Home => <HomePage />
         | NotFound => <NotFoundPage />
         },

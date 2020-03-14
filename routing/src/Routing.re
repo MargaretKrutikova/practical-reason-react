@@ -23,6 +23,7 @@ let useAppUrl = () => {
     }
   | [path, id] when path == Paths.productPage => Product(id)
   | [path] when path == Paths.homePage => Home
+  | [] => Home
   | _ => NotFound
   };
 };
