@@ -6,37 +6,26 @@ type t =
   | Paused(elapsed)
   | Done(elapsed);
 
-/* function per each state transition */
-let start = status =>
-  switch (status) {
-  | NotStarted => Running(0.0)
-  | other => other
-  };
-
-let pause =
-  fun
-  | Running(time) => Paused(time)
-  | other => other;
-
-let resume =
-  fun
-  | Paused(time) => Running(time)
-  | other => other;
+type input =
+  | Start
+  | Pause
+  | Resume
+  | Finish
+  | Tick(elapsed);
 
 /* encode business rules inside state transitions:
-      1. Running and paused tasks can be finished
-      2. Not started tasks can't be finished
+     1. Running and paused tasks can be finished
+     2. Not started tasks can't be finished
    */
-let finish =
-  fun
-  | Running(time)
-  | Paused(time) => Done(time)
-  | other => other;
-
-let tick = (elapsed, status) =>
-  switch (status) {
-  | Running(time) => Running(time +. elapsed)
-  | other => other
+let transition = (input, state) =>
+  switch (state, input) {
+  | (NotStarted, Start) => Running(0.0)
+  | (Running(elapsed), Pause) => Paused(elapsed)
+  | (Running(elapsed), Finish) => Done(elapsed)
+  | (Paused(elapsed), Resume) => Running(elapsed)
+  | (Paused(elapsed), Finish) => Done(elapsed)
+  | (Running(elapsed), Tick(tick)) => Running(elapsed +. tick)
+  | _ => state
   };
 
 /* utility functions */

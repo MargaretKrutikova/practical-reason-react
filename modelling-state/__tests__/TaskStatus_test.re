@@ -4,70 +4,33 @@ open TaskStatus;
 describe("Task status transitions", () => {
   open Expect;
 
-  test("start transition returns Running state from NotStarted", () =>
-    expect(NotStarted |> start) |> toEqual(Running(0.0))
+  testAll(
+    "Transition works correctly for valid state transitions",
+    [
+      (NotStarted, Start, Running(0.0)),
+      (Running(10.0), Pause, Paused(10.0)),
+      (Running(10.0), Finish, Done(10.0)),
+      (Paused(10.0), Resume, Running(10.0)),
+      (Paused(10.0), Finish, Done(10.0)),
+      (Running(10.0), Tick(15.0), Running(25.0)),
+    ],
+    ((currentState, input, nextState)) =>
+    expect(currentState |> transition(input)) |> toEqual(nextState)
   );
 
   testAll(
-    "start transition returns the same state if not NotStarted",
-    [Running(10.0), Paused(10.0), Done(10.0)],
-    status =>
-    expect(status |> start) |> toEqual(status)
+    "Transition returns current state for invalid state transitions",
+    [
+      ([|Running(5.0), Paused(5.0), Done(5.0)|], Start, " when started"),
+      ([|NotStarted, Paused(10.0), Done(10.0)|], Pause, " when paused"),
+      ([|NotStarted, Running(10.0), Done(10.0)|], Resume, " when resumed"),
+      ([|NotStarted, Done(10.0)|], Finish, " when finished"),
+      ([|NotStarted, Paused(5.0), Done(5.0)|], Tick(1.0), " when ticked"),
+    ],
+    ((states, input, _)) =>
+    expect(states->Belt.Array.map(state => state |> transition(input)))
+    |> toEqual(states)
   );
-
-  test(
-    "pause transition returns Paused state from Running with the same elapsed",
-    () => {
-    expect(Running(42.2) |> pause) |> toEqual(Paused(42.2))
-  });
-
-  testAll(
-    "pause transition returns the same state if not Running",
-    [NotStarted, Paused(10.0), Done(10.0)],
-    status => {
-    expect(status |> pause) |> toEqual(status)
-  });
-
-  test(
-    "resume transition returns Running state from Paused with the same elapsed",
-    () => {
-    expect(Paused(42.2) |> resume) |> toEqual(Running(42.2))
-  });
-
-  testAll(
-    "resume transition returns the same state if not Paused",
-    [NotStarted, Running(10.0), Done(10.0)],
-    status => {
-    expect(status |> resume) |> toEqual(status)
-  });
-
-  test(
-    "done transition returns Done state from Running with the same elapsed", () => {
-    expect(Running(42.2) |> finish) |> toEqual(Done(42.2))
-  });
-
-  test(
-    "done transition returns Done state from Paused with the same elapsed", () => {
-    expect(Paused(42.2) |> finish) |> toEqual(Done(42.2))
-  });
-
-  testAll(
-    "done transition returns the same state if not Running or Paused",
-    [NotStarted, Done(10.0)],
-    status => {
-    expect(status |> finish) |> toEqual(status)
-  });
-
-  test("tick transition adds tick to the elapsed time if Running", () => {
-    expect(Running(20.8) |> tick(21.2)) |> toEqual(Running(42.0))
-  });
-
-  testAll(
-    "tick transition returns the same state if not Running",
-    [NotStarted, Paused(10.0), Done(10.0)],
-    status => {
-    expect(status |> tick(21.2)) |> toEqual(status)
-  });
 });
 
 describe("Task status utility functions", () => {

@@ -17,8 +17,8 @@ type action =
 let updateTaskById = (id, update, tasks: array(Task.t)) =>
   tasks->Belt.Array.map(task => task.id == id ? update(task) : task);
 
-let updateTaskStatus = (id, updateStatusFn, state) => {
-  let updateTaskFn = updateStatusFn |> Task.withStatus;
+let updateTaskStatus = (id, taskStatusInput: TaskStatus.input, state) => {
+  let updateTaskFn = Task.withStatus(taskStatusInput);
   {tasks: state.tasks |> updateTaskById(id, updateTaskFn)};
 };
 
@@ -34,24 +34,25 @@ let addTask = (id, name, state) => {
 let getRunningTask = state =>
   state.tasks->Belt.Array.getBy(task => task.status |> TaskStatus.isRunning);
 
-let updateRunningTask = (updateFn, state) =>
+let updateRunningTask = (taskStatusInput: TaskStatus.input, state) =>
   switch (state |> getRunningTask) {
   | None => state
-  | Some(runningTask) => state |> updateTaskStatus(runningTask.id, updateFn)
+  | Some(runningTask) =>
+    state |> updateTaskStatus(runningTask.id, taskStatusInput)
   };
 
-let pauseRunningTask = state => state |> updateRunningTask(TaskStatus.pause);
+let pauseRunningTask = state => state |> updateRunningTask(TaskStatus.Pause);
 
 let reducer = (action, state) => {
   switch (action) {
   | TaskStarted(id) =>
-    state |> pauseRunningTask |> updateTaskStatus(id, TaskStatus.start)
-  | TaskPaused(id) => state |> updateTaskStatus(id, TaskStatus.pause)
+    state |> pauseRunningTask |> updateTaskStatus(id, TaskStatus.Start)
+  | TaskPaused(id) => state |> updateTaskStatus(id, TaskStatus.Pause)
   | TaskResumed(id) =>
-    state |> pauseRunningTask |> updateTaskStatus(id, TaskStatus.resume)
-  | TaskDone(id) => state |> updateTaskStatus(id, TaskStatus.finish)
+    state |> pauseRunningTask |> updateTaskStatus(id, TaskStatus.Resume)
+  | TaskDone(id) => state |> updateTaskStatus(id, TaskStatus.Finish)
   | TaskRemoved(id) => state |> removeTask(id)
-  | Tick(elapsed) => state |> updateRunningTask(TaskStatus.tick(elapsed))
+  | Tick(elapsed) => state |> updateRunningTask(TaskStatus.Tick(elapsed))
   | TaskAdded(id, name) => state |> addTask(id, name)
   };
 };

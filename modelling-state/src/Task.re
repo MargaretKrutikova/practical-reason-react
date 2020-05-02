@@ -17,7 +17,8 @@ type t = {
 // always begin in status NotStarted
 let make = (~name, ~id) => {id, name, status: NotStarted};
 
-let withStatus = (updateStatus, task) => {
-  ...task,
-  status: updateStatus(task.status),
+let withStatus = (taskStatusInput: TaskStatus.input, task) => {
+  let nextStatus = TaskStatus.transition(taskStatusInput, task.status);
+
+  {...task, status: nextStatus};
 };
