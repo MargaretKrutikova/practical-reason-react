@@ -1,13 +1,3 @@
-// module TaskId: {
-//   type t;
-//   let make: unit => t;
-// } = {
-//   type t = string;
-//   let make = () => {
-
-//   }
-// };
-
 type t = {
   id: string,
   name: string,
