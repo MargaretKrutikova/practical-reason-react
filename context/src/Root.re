@@ -13,9 +13,12 @@ let reducer = (_, action) =>
 let make = () => {
   let (state, dispatch) = React.useReducer(reducer, initialState);
 
+  let context =
+    React.useMemo2(() => (state.user, dispatch), (state.user, dispatch));
+
   // if needed, could be optimized with useMemo, or split into two context
   // providers for user and dispatch separately
-  <UserProvider value=(state.user, dispatch)>
+  <UserProvider value=context>
     <> <Header /> <main> <Page /> </main> </>
   </UserProvider>;
 };
