@@ -1,5 +1,7 @@
 # Modelling domain with state machines in ReasonML
 
+The article is also available at [dev.to](https://dev.to/margaretkrutikova/modelling-domain-with-state-machines-in-reason-n29).
+
 This is the first article in the series, where we will focus on modelling state and state handling logic of a system in a functional way, without touching the user interface.
 
 The idea behind "functional way" here is applying functional patterns and constructs in order to:
@@ -36,7 +38,7 @@ According to the requirements of the system, we should be able to:
 
 So apart from having a `name` and probably `id`, a task should know whether it is running, paused, done etc., which we will call `status`. Then our `task` could look like this:
 
-```reasonml
+```reason
 type task = {
   id: string,
   name: string,
@@ -65,7 +67,7 @@ State transitions in a state machine can be represented as a function:
 
 We will model our `status` property as a state machine and represent its possible states with a `ReasonML` variant:
 
-```reasonml
+```reason
 type elapsed = float;
 
 type taskStatus =
@@ -85,7 +87,7 @@ Each state except `NotStarted`, will hold a time interval which we will represen
 
 I will add one more transition from `Running` to `Running` with elapsed time increased after each timer tick. The input that the state machine will accept can be represented as a variant too:
 
-```reasonml
+```reason
 type input =
   | Start
   | Pause
@@ -114,7 +116,7 @@ Check the task-status example live [here](https://xstate.js.org/viz/?gist=731a6b
 
 The transition function itself will accept a value of type input and the current state, and do a pattern match on both values matching only on valid combinations of pairs `(state, input)`:
 
-```reasonml
+```reason
 let transition = (input, state) =>
   switch (state, input) {
   | (NotStarted, Start) => Running(0.0)
@@ -141,7 +143,7 @@ Since we probably don't want to write a test per each valid and invalid transiti
 
 Testing valid transitions:
 
-```reasonml
+```reason
   testAll(
     "Transition works correctly for valid state transitions",
     [
@@ -161,7 +163,7 @@ Here we are feeding a tuple of three values into each test: currentState, input 
 
 Testing invalid transitions is very similar. We will pass a tuple of a list of states and an input, where each of the combination (state, input) is invalid and should result in the same state after applying the transition function.
 
-```reasonml
+```reason
   testAll(
     "Transition returns current state for invalid state transitions",
     [
