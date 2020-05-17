@@ -18,14 +18,32 @@ type input =
      2. Not started tasks can't be finished
    */
 let transition = (input, state) =>
-  switch (state, input) {
-  | (NotStarted, Start) => Running(0.0)
-  | (Running(elapsed), Pause) => Paused(elapsed)
-  | (Running(elapsed), Finish) => Done(elapsed)
-  | (Paused(elapsed), Resume) => Running(elapsed)
-  | (Paused(elapsed), Finish) => Done(elapsed)
-  | (Running(elapsed), Tick(tick)) => Running(elapsed +. tick)
-  | _ => state
+  switch (state) {
+  | NotStarted =>
+    switch (input) {
+    | Start => Running(0.0)
+    | Pause
+    | Finish
+    | Tick(_)
+    | Resume => state
+    }
+  | Running(elapsed) =>
+    switch (input) {
+    | Pause => Paused(elapsed)
+    | Finish => Done(elapsed)
+    | Tick(tick) => Running(elapsed +. tick)
+    | Start
+    | Resume => state
+    }
+  | Paused(elapsed) =>
+    switch (input) {
+    | Resume => Running(elapsed)
+    | Finish => Done(elapsed)
+    | Tick(_)
+    | Start
+    | Pause => state
+    }
+  | Done(_) => state
   };
 
 /* utility functions */
